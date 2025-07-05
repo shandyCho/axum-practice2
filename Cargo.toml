@@ -1,0 +1,21 @@
+[package]
+name = "testProject"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+axum = "^0.8.4"
+tokio = { version = "^1", features = ["full"] }
+# 미들웨어 패키지
+tower = "0.5.2"
+# tower-http의 경우 features flag를 설정하지 않으면 trace 기능을 사용할 수 없다
+tower-http = { version = "0.6.6", features = ["full"] }
+# JSON 직렬화 및 역직렬화 패키지
+serde = { version = "^1", features = ["derive"] }
+serde_json = "1.0.111"
+# 환경변수 관리 파일 .env 파일 관련 유틸 패키지
+dotenv = "0.15"
+# 로깅 및 추적 패키지
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
