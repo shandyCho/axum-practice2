@@ -1,9 +1,17 @@
 // JSON 형태로 응답하기 위해서 axum의 Json 구조체를 사용한다.
-use axum::Json;
+use axum::{
+    extract::Extension, http::{
+        header, HeaderMap, HeaderValue, StatusCode
+    }, response::{
+        IntoResponse
+    }, Json
+};
+
 // mod.rs에 정의한 요소들을 사용하고자 할 때는 use문을 쓰나 가장 먼저 crate 에서 시작해야한다.
 use crate::dashboard::structs::{Dashboard, LikeContent};
 
-pub async fn load_dashboard() -> Json<Dashboard> {
+#[axum::debug_handler] 
+pub async fn load_dashboard() -> impl IntoResponse {
 
     let like_list = vec![
         LikeContent::new(
@@ -23,7 +31,18 @@ pub async fn load_dashboard() -> Json<Dashboard> {
         String::from("내 이름은 shandyCho 입니다. shandy는 좋아하는 노래의 제목에서 가져왔습니다."),
         like_list
         );
+    let dashboard_string = format!("{:?}", dashboard.clone());
 
-    // Rust의 구조체를 JSON으로 직렬화하여 반환한다.
-    Json(dashboard)
+    let body = Json(dashboard.clone());
+    
+    let mut headers = HeaderMap::new();
+    headers.insert(header::CONTENT_TYPE, HeaderValue::from_static("application/json"));
+    (
+        StatusCode::OK,
+        headers,
+        Extension(dashboard_string),
+        body
+    )
 }
+
+

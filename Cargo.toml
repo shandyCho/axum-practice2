@@ -5,12 +5,12 @@ edition = "2024"
 
 [dependencies]
 
-axum = "^0.8.4"
+axum = { version = "^0.8.4", features = ["macros", "default"] }
 tokio = { version = "^1", features = ["full"] }
 # 미들웨어 패키지
 tower = "0.5.2"
 # tower-http의 경우 features flag를 설정하지 않으면 trace 기능을 사용할 수 없다
-tower-http = { version = "0.6.6", features = ["full"] }
+tower-http = { version = "0.6.6", features = ["full", "set-status"] }
 # JSON 직렬화 및 역직렬화 패키지
 serde = { version = "^1", features = ["derive"] }
 serde_json = "1.0.111"

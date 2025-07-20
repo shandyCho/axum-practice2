@@ -3,14 +3,14 @@
 // Deserialize 트레이트는 JSON 데이터를 Rust 구조체로 변환할 수 있게 해준다.
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LikeContent {
     content_title: String,
     content_description: String,
     content_id: u32,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Dashboard {
     name: String,
     description: String,
