@@ -27,15 +27,8 @@ pub mod config2 {
     use tower_http::trace::{DefaultMakeSpan, OnRequest, OnResponse, TraceLayer};
     use tower_http::classify::{ServerErrorsAsFailures, SharedClassifier};
     use tracing::{Level, Span};
+    use crate::config::structs::config_structurs::CustomDefaultOnRequest;
 
-    #[derive(Clone, Debug)]
-    pub struct CustomDefaultOnRequest;
-
-    impl OnRequest<Body> for CustomDefaultOnRequest {
-        fn on_request(&mut self, request: &Request<Body>, _span: &Span) {
-            tracing::info!("started {} {}", request.method(), request.uri().path())
-        }
-    }
 
     #[derive(Clone, Debug)]
     pub struct CustomDefaultOnResponse;

@@ -1,17 +1,15 @@
 // JSON 형태로 응답하기 위해서 axum의 Json 구조체를 사용한다.
 use axum::{
-    extract::Extension, http::{
+    extract::{Extension, Path}, http::{
         header, HeaderMap, HeaderValue, StatusCode
-    }, response::{
-        IntoResponse
-    }, Json
+    }, response::IntoResponse, Json
 };
 
 // mod.rs에 정의한 요소들을 사용하고자 할 때는 use문을 쓰나 가장 먼저 crate 에서 시작해야한다.
 use crate::dashboard::structs::{Dashboard, LikeContent};
 
 #[axum::debug_handler] 
-pub async fn load_dashboard() -> impl IntoResponse {
+pub async fn load_all_dashboard() -> impl IntoResponse {
 
     let like_list = vec![
         LikeContent::new(
@@ -45,4 +43,21 @@ pub async fn load_dashboard() -> impl IntoResponse {
     )
 }
 
+// 스칼라 타입 그대로 받을 것인지 struct 만들어서 받고 Some/None 매치문 태워서 분기처리 할 지 생각해보기
+pub async fn load_some_dashbaord(Path(content_number): Path<u32>) -> impl IntoResponse {
+    tracing::info!("content number: {:?}", content_number);
+    let mut header = HeaderMap::new();
+    // header.insert(header::CONTENT_TYPE, HeaderValue::from_static("application/json"));
+    header.insert(header::CONTENT_TYPE, HeaderValue::from_static("text/plain"));
+    match content_number {
+        1 => tracing::info!("콘텐츠 넘버는 1입니다"),
+        2 => tracing::info!("콘텐츠 넘버는 2입니다"),
+        _ => tracing::info!("콘텐츠 넘버는 1도 2도 아닙니다"),
+    };
+    (
+        StatusCode::OK,
+        header,
+        "우리는 이제 리퀘스트를 받을 수 있어요!".to_string()
+    )
+}
 
