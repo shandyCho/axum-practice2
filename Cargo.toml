@@ -6,16 +6,25 @@ edition = "2024"
 [dependencies]
 
 axum = { version = "^0.8.4", features = ["macros", "default"] }
+# HTTP Request Header에서 값을 추출하기 위한 크레이트
+axum-extra = { version = "0.12.5", features = ["typed-header"]}
+# rustup update stable 명령어 수행 후 추가 (time 관련 크레이트트들의 rustc 최소 버전이 1.88 이상으로 올라갔기 때문에 수행함)
+# JWT 사용을 위하여 추가한 크레이트
+jsonwebtoken = { version = "^10.3.0", features = ["rust_crypto", "default"] }
+# secret 값 등을 정의한 toml 을 읽어서 파싱하기 위한 크레이트
+toml = "1.0.3"
+# 비밀번호 해싱 크레이트
+bcrypt = "0.18.0"
 tokio = { version = "^1", features = ["full"] }
-# 미들웨어 패키지
+# 미들웨어 크레이트
 tower = "0.5.2"
 # tower-http의 경우 features flag를 설정하지 않으면 trace 기능을 사용할 수 없다
 tower-http = { version = "0.6.6", features = ["full", "set-status"] }
-# JSON 직렬화 및 역직렬화 패키지
+# JSON 직렬화 및 역직렬화 크레이트
 serde = { version = "^1", features = ["derive"] }
 serde_json = "1.0.111"
-# 환경변수 관리 파일 .env 파일 관련 유틸 패키지
+# 환경변수 관리 파일 .env 파일 관련 유틸 크레이트
 dotenv = "0.15"
-# 로깅 및 추적 패키지
+# 로깅 및 추적 크레이트
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
