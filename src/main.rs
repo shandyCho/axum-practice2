@@ -37,7 +37,13 @@ async fn main() {
     let axum_config = application_config.get_axum_config(); 
     
     tracing_subscriber::fmt::init(); // 로깅 구독자 초기화 및 시작
-    let logging_layer = ServiceBuilder::new()
+
+    // 서버 IP 및 포트 정의
+    // let addr = "0.0.0.0:3500";
+    let addr = axum_config.get_addr();
+
+    // 미들웨어 정의
+    let auth_layer = ServiceBuilder::new()
         // .layer(config::logging_config::config2::logging_setup2())
         .layer(middleware::from_fn_with_state(jwt_config_state.clone(), verify_jwt));
 
@@ -47,12 +53,11 @@ async fn main() {
         .allow_headers([AUTHORIZATION, CONTENT_TYPE])
         .expose_headers([AUTHORIZATION]);   // 프론트엔드에서 Authorization 헤더값에 접근하기 위해 필요함 (Access-Control-Expose-Headers 헤더에 값을 추가해주는 것)
 
+    // 서버 전역에 적용되어야 할 미들웨어의 묶음    
     let global_layer = ServiceBuilder::new()
         .layer(config::logging_config::config2::logging_setup2())
         .layer(cors_layer);
-    // 서버 IP 및 포트 정의
-    // let addr = "0.0.0.0:3500";
-    let addr = axum_config.get_addr();
+
     // 라우터 정의
     // State를 사용해야 하는 라우터이기 때문에 따로 분리해줌
     let login_router = || -> Router {
@@ -65,9 +70,7 @@ async fn main() {
     .route("/", get(|| async {" Hello, World!"}))
     .route("/api/v1/hello", get(hello))
     .route("/api/v1/dashboard", get(load_dashboard))
-    // .route("/api/v1/login", post(login))
-    // .route_layer()
-    .layer(logging_layer)
+    .layer(auth_layer)
     .nest("/api/v1", login_router())
     .layer(global_layer);
 
