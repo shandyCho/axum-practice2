@@ -1,25 +1,22 @@
 use axum::{
-    Json, 
-    extract::State, 
-    http::{
+    Extension, Json, extract::State, http::{
         HeaderMap, 
         HeaderValue, 
         StatusCode, 
         header
-    }, 
-    response::IntoResponse};
+    }, response::IntoResponse};
 use bcrypt::{DEFAULT_COST, hash, verify};
 use serde::{Deserialize, Serialize};
 
 use crate::{JWTConfigState, auth::jwt::create_token};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct LoginParameter {
     pub account: String,
     pub password: String
 }
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 struct LoginResult {
     message: String,
     nickname: String
@@ -57,6 +54,7 @@ pub async fn login(State(jwt_config_state): State<JWTConfigState>, Json(payload)
                 (
                     StatusCode::OK,
                     headers,
+                    Extension(format!("{:?}", login_result.clone())),
                     Json(login_result.clone())
                 )
                 }
@@ -68,6 +66,7 @@ pub async fn login(State(jwt_config_state): State<JWTConfigState>, Json(payload)
                     (
                         StatusCode::UNAUTHORIZED,
                         headers,
+                        Extension(format!("{:?}", login_result.clone())),
                         Json(login_result.clone())
                     )
                 }
@@ -81,6 +80,7 @@ pub async fn login(State(jwt_config_state): State<JWTConfigState>, Json(payload)
             (
                 StatusCode::UNAUTHORIZED,
                 headers,
+                Extension(format!("{:?}", login_result.clone())),
                 Json(login_result.clone())
             )
         }

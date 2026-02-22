@@ -33,11 +33,7 @@ pub mod config2 {
 
     impl OnRequest<Body> for CustomDefaultOnRequest {
         fn on_request(&mut self, request: &Request<Body>, _span: &Span) {
-            let req = request.extensions().get::<String>();
-            match req {
-                Some(body) => tracing::info!("started {} {} Body: {}", request.method(), request.uri().path(), body),
-                None => tracing::info!("started {} {} ", request.method(), request.uri().path()) 
-            }
+            tracing::info!("started {} {} ", request.method(), request.uri().path()) 
         }
     }
 

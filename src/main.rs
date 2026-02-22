@@ -37,15 +37,19 @@ async fn main() {
     let axum_config = application_config.get_axum_config(); 
     
     tracing_subscriber::fmt::init(); // 로깅 구독자 초기화 및 시작
-    let service_layer = ServiceBuilder::new()
-    .layer(config::logging_config::config2::logging_setup2())
-    .layer(middleware::from_fn_with_state(jwt_config_state.clone(), verify_jwt));
+    let logging_layer = ServiceBuilder::new()
+        // .layer(config::logging_config::config2::logging_setup2())
+        .layer(middleware::from_fn_with_state(jwt_config_state.clone(), verify_jwt));
 
     let cors_layer = CorsLayer::new()
-    .allow_methods([Method::GET, Method::POST])
-    .allow_origin(Any)
-    .allow_headers([AUTHORIZATION, CONTENT_TYPE])
-    .expose_headers([AUTHORIZATION]);   // 프론트엔드에서 Authorization 헤더값에 접근하기 위해 필요함 (Access-Control-Expose-Headers 헤더에 값을 추가해주는 것)
+        .allow_methods([Method::GET, Method::POST])
+        .allow_origin(Any)
+        .allow_headers([AUTHORIZATION, CONTENT_TYPE])
+        .expose_headers([AUTHORIZATION]);   // 프론트엔드에서 Authorization 헤더값에 접근하기 위해 필요함 (Access-Control-Expose-Headers 헤더에 값을 추가해주는 것)
+
+    let global_layer = ServiceBuilder::new()
+        .layer(config::logging_config::config2::logging_setup2())
+        .layer(cors_layer);
     // 서버 IP 및 포트 정의
     // let addr = "0.0.0.0:3500";
     let addr = axum_config.get_addr();
@@ -63,9 +67,9 @@ async fn main() {
     .route("/api/v1/dashboard", get(load_dashboard))
     // .route("/api/v1/login", post(login))
     // .route_layer()
-    .layer(service_layer)
+    .layer(logging_layer)
     .nest("/api/v1", login_router())
-    .layer(cors_layer);
+    .layer(global_layer);
 
 
 
