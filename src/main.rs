@@ -16,6 +16,7 @@ use tower_http::cors::{Any, CorsLayer};
 use crate::config::application_config::{get_application_config, Config, JwtConfig};
 use crate::dashboard::dashboard_handler::load_dashboard;
 use crate::auth::{login::login, jwt::verify_jwt};
+use crate::config::logging_config::config2::{logging_request, logging_setup2};
 
 // JSON 직렬화를 위한 트레이트를 자동으로 구현
 #[derive(Serialize)]
@@ -55,7 +56,8 @@ async fn main() {
 
     // 서버 전역에 적용되어야 할 미들웨어의 묶음    
     let global_layer = ServiceBuilder::new()
-        .layer(config::logging_config::config2::logging_setup2())
+        .layer(middleware::from_fn(logging_request))
+        .layer(logging_setup2())
         .layer(cors_layer);
 
     // 라우터 정의
@@ -67,12 +69,12 @@ async fn main() {
     };
 
     let router = Router::new()
-    .route("/", get(|| async {" Hello, World!"}))
-    .route("/api/v1/hello", get(hello))
-    .route("/api/v1/dashboard", get(load_dashboard))
-    .layer(auth_layer)
-    .nest("/api/v1", login_router())
-    .layer(global_layer);
+        .route("/", get(|| async {" Hello, World!"}))
+        .route("/api/v1/hello", get(hello))
+        .route("/api/v1/dashboard", get(load_dashboard))
+        .layer(auth_layer)
+        .nest("/api/v1", login_router())
+        .layer(global_layer);
 
 
 
